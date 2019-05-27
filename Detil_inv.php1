@@ -1,0 +1,140 @@
+<?php ob_start(); ?>
+<?php include "koneksi.php"; ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script src="js/jquery-1.12.2.min.js"></script>
+  <script src="js/bootstrap.min.js"></script> 
+<title>Untitled Document</title>
+</head>
+<style>
+	.pembatas{
+		border-left: 1px solid #d5d5d5;
+		border-right: 1px solid #d5d5d5;
+	  }
+</style>
+<body>
+<?php
+	session_start();
+	if(!isset($_SESSION['uname'])){
+		header('location:Masuk.php');
+	}else{
+	include "act/header.php"; 
+	
+?>
+<div style="padding-top:3%">
+	<div class="container-fluid" style="padding-top:3%">
+  		<h1 align="center">Warung Kertas</h1><br/>
+  			<div class="row"><p>ini row bungkus semua .col-lg-12<p>         
+               <div class="col-lg-12" style="background-color:lavenderblush">
+               <div class="col-lg-2"></div>
+               <div class="col-lg-8">
+               <?php
+					$query=mysql_query("select ID_b,ID_k,Nama_b,Harga_b,Jumlah,Tanggalbeli from keranjang where ID_p='$_SESSION[ID]' and Lunas='false'");			
+							$no=1;
+								    ?>
+									<div class="panel panel-primary">
+                                        <div class="panel-heading">List Barang:</div>
+                                    	
+										<table class="table table-Stripped table-hover">
+                                        <thead > <!-- bgcolor="#337ab7" --> 
+											<tr >
+												<th>No</th>
+										        <th>Nama Barang</th>
+								                <th>Harga Barang</th>
+								                <th>Jumlah</th>
+								                <th>Total</th>
+								                <th>Tanggal Beli</th>
+										    </tr>								
+                                        </thead>    
+                                   <?php         
+									while($q=mysql_fetch_array($query)){
+										echo "
+										<body>
+										    <tr align='center'>
+												<td>$no</th>
+								                <td><a href='Detil.php?br=$q[ID_b]'>$q[Nama_b]</td>
+								                <td>$q[Harga_b]</td>
+								                <td>$q[Jumlah]</td>
+								                <td>".$q['Harga_b']*$q['Jumlah']."</td>
+								                <td>$q[Tanggalbeli]</td>	
+										    </tr>
+											</tbody>
+											";
+											
+											$no++;								
+										}		
+										echo "
+										</table>
+										
+										</div>
+										";
+									$qtot=mysql_query("select SUM(Harga_b*jumlah) as totb from keranjang where ID_p='$_SESSION[ID]' and lunas ='false'");
+									while($q=mysql_fetch_array($qtot)){
+											$totb=$q['totb'];									
+										}
+										
+										echo "<p align='right'><Strong>Total Harga: Rp.$totb.00,-</Strong></p>";
+										
+					?>
+                    				<!--buat form input-->
+                                   <div class="col-lg-12">
+                                        	<form action="act/Beli_update.php" method="post">
+                                            
+                                            
+                                            <div class="col-lg-4">
+                                                <select name="Jasa" class="form-control" required>
+                                                    <option value="">--PIlih Jasa pengiriman--</option>
+                                                    <option value="JNE">JNE</option>
+                                                    <option value="TIKI">TIKI</option>
+                                                    <option value="Kantor Pos">Kantor Pos</option>
+                                                </select>
+                                            </div>
+                                            <input type="hidden" name="total" value="<?php echo $totb;?>" />
+                                            
+                                            <div class="col-lg-3">
+                                            	<select name="Paket" class="form-control" required>
+                                                    <option value="">--PIlih Paket--</option>
+                                                    <option value="1 Hari">1 Hari</option>
+                                                    <option value="2 Hari">2 Hari</option>
+                                                    <option value="3 Hari">3 Hari</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="col-lg-3">
+                                            	<input name="uang" type="number" min="<?php echo $totb;?>" value="<?php echo $totb;?>" class="form-control" placeholder="Pembayaran" required/> 
+                                                 <!-- <span class="input-group-addon">Rp</span>
+                                                  <input type="text" class="form-control" name="uang" placeholder="Pembayaran" aria-label="Amount (to the nearest dollar)">
+                                                  <span class="input-group-addon">.00</span>-->
+                                            </div>
+                                            
+                                            <div class="col-lg-2">
+                                            	<center><input type="submit" class="btn btn-primary" value="Setuju"></center>
+                                            </div>    
+                                            
+                                            
+                                            </form>
+                                            
+                                              <!--                                              
+                                             <center><a href='act/Beli_update.php?harga=<?php//echo "$_POST[jasa]";?>' class='btn btn-success' role='button'>Beli <?php// echo "ini : $_POST[uang]"; ?> </a><span/></center> -->
+                                    	</div>
+                                   </div>
+                                   </div>
+                                   
+                     <div class="col-lg-2"></div>
+				</div>       
+			</div>    			
+ 	</div>
+</div>
+
+<?php
+	}
+?>
+</body>
+</html>
+
+
+<?php ob_flush();?>
